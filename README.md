@@ -4,6 +4,6 @@
 
 - A PID controller continuously calculates an error value e(t) as the difference between a desired set point (SP) and a measured process variable (PV) and applies a correction based on proportional, integral, and derivative terms (denoted P, I, and D respectively), hence the name.
 
--- test
+  - ***e(t) = (SP - PV)(t)***
 
 - Work Study in Progress...
