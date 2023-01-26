@@ -14,9 +14,9 @@
 - **Controller.h**         
     - (PID Controller)
 
-***Dependencies***
+***Control Manager class require the following dependencies***
 + ***ControlManager.h***     
-    - (depended on *LinearMap.h* and *RandomNumber.h*)
+    - (depended on *Controller.h*, *LinearMap.h* and *RandomNumber.h*)
 
 ## ***src folder***
 
