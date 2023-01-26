@@ -5,16 +5,12 @@
 ## ***include folder***
 
 **Following classes are stand-alone**
-
 - **LinearMap.h**      
     - (updated)
-
 - **Timer.h**          
     - (updated)
-
 - **RandomNumber.h**   
     - (updated)
-
 - **Controller.h**         
     - (updated)
 
