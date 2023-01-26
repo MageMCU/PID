@@ -6,13 +6,13 @@
 
 **Following classes are stand-alone**
 - **LinearMap.h**      
-    - (updated)
+    - (The LinearMap.h file is located in the Numerics Repository)
 - **Timer.h**          
-    - (updated)
+    - (The Timer.h file is located in the Numerics Repository)
 - **RandomNumber.h**   
-    - (updated)
+    - (The RandomNumber.h file is located in the Numerics Repository)
 - **Controller.h**         
-    - (updated)
+    - (PID Controller)
 
 ***Dependencies***
 + ***ControlManager.h***     
