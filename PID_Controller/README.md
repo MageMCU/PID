@@ -20,7 +20,8 @@
 
 ## ***src folder***
 
-- main.cpp
+- main.cpp  
+    - (depended on *Timer.h*)
 
 ## ***root folder***
 
