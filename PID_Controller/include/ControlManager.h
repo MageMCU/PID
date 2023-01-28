@@ -165,9 +165,11 @@ namespace pid
         m_control = m_controller.UpdatePID(m_measuredValue);
 
         // WITH-OUT SIMULATION
+        // Linear - Bounded
         m_measuredValue += m_control;
 
         // SIMULATION 
+        // Linear - Bounded
         // m_simulation();
 
         // Circular - Non-bounded
