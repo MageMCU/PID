@@ -21,6 +21,7 @@ namespace pid
         real Error();
         real Integral();
         real Derivative();
+        real Control();
 
         // Setters
         void SetPoint(real setPoint);
@@ -37,10 +38,12 @@ namespace pid
 
     private:
         // Inputs
-        real m_setPoint; // desired value
-        real m_measuredValue;
+        real m_setPoint;
         // Errors
         real m_last_ef;
+        // Control
+        real m_uf;
+        real m_last_uf;
         // Proportional
         real m_proportional;
         // Integral
@@ -53,7 +56,7 @@ namespace pid
         real m_Ki;
         real m_Kd;
 
-        // Sampled Time
+        // Sampled Time (deltaTime) constant
         real m_Ts;
 
         // Private Methods
@@ -65,15 +68,18 @@ namespace pid
     template<typename real>
     Controller<real>::Controller(real Kp, real Ki, real Kd, real Ts)
     {
-        // errors
+        // Error Function
         m_last_ef = (real)0;
+        // Control Function
+        m_uf = (real)0;
+        m_last_uf = (real)0;
         // integral
         m_integral = (real)0;
         // Controller Gains
         m_Kp = Kp;
         m_Ki = Ki;
         m_Kd = Kd;
-        // Sampled Time
+        // Sampled Time (deltaTime) constant
         m_Ts = Ts;
     }
 
@@ -97,6 +103,12 @@ namespace pid
         return m_derivative;
     }
 
+    template<typename real>
+    real Controller<real>::Control()
+    {
+        return m_uf;
+    }
+
     // Setters
 
     template<typename real>
@@ -110,27 +122,40 @@ namespace pid
     template<typename real>
     real Controller<real>::UpdatePID(real measuredValue)
     {
-        // PID Calculations
-        // Studied several papers on PID controllers
-        // and finally subtracted-out the most basic
-        // elements on the subject... 
+        // Finite PID Approximations (Van de Vegte, FCS, 1986, p232) 
 
         // Error Function
         real ef = m_setPoint - measuredValue;
 
-        // Integral
+        // Integral Finite-Difference Approximation
+        // Integral (backward rectangular rule)
         real integral = m_integral + ef * m_Ts;
 
-        // Derivative
+        // Clamp integrator windup output (Hi & Lo)
+        // NOT USED
+
+        // Derivative Finite-Difference Approximation
+        // Derivative (backward difference)
         real derivative = (ef - m_last_ef) / m_Ts;
 
+        // Besides the backward, there are forward
+        // and central approximations...
+
         // Store Values for csv-file
+        m_last_ef = ef;
         m_integral = integral;
         m_derivative = derivative;
-        m_last_ef = ef;
 
-        // Control Value
-        return m_Kp * ef + m_Ki * integral + m_Kd * derivative;
+        // Control  Function
+        real uf = (m_Kp * ef) + (m_Ki * integral) + (m_Kd * derivative);
+
+        // U-Velocity Algorithm: uV = uf - m_last_uf; NOT USED
+        // m_last_uf = m_uf;
+        m_uf = uf;
+        // return uf - m_last_uf;
+
+        // U-Positional Algorithm: uP = uf
+        return uf;
     }
 
     // Strings

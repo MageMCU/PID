@@ -5,7 +5,6 @@
 
 #include "Controller.h"
 #include "RandomNumber.h"
-#include "LinearMap.h"
 
 namespace pid
 {
@@ -29,8 +28,10 @@ namespace pid
     class ControlManager
     {
     public:
+
         // Constructor
         ControlManager() = default;
+        ControlManager(real sampledTime);
         ControlManager(real min, real max, real sampledTime);
         ~ControlManager() = default;
 
@@ -50,9 +51,12 @@ namespace pid
         String PrintIntegralPID();
         String PrintDerivativePID();
         String PrintControlPID();
+        String PrintEID_PID();
         String PrintFunctionsPID();
 
     private:
+
+        int m_counter;
         // Properties
         real m_min;
         real m_max;
@@ -63,16 +67,46 @@ namespace pid
         real m_maxPlantOutput;
         pid::Controller<float> m_controller;
         nmr::RandomNumber<float> m_rNum;
-        nmr::LinearMap<float> m_linearMap;
 
         // Private Method
         // Includes Both Random Values
         void m_SetRandomPoints();
         // Random Measured Value
         void m_SetRandomMeasuredValue();
+        // Power Plant Simulation
+        void m_simulation();
+        // Disturbance Simulation
+        real m_disturbance();
     };
 
     // Constructor
+
+    template <typename real>
+    ControlManager<real>::ControlManager(real sampledTime)
+    {
+        m_counter = 0;
+        // THIS IS NECESSARY TO UNDERSTAND THE MATH
+        // Consistent data for
+        // repeatable experiments...
+        m_min = (real)0;
+        m_max = (real)1000;
+        // K-values domain: 0-1.0
+        real Kp = (real)0.40;
+        real Ki = (real)0.0;
+        real Kd = (real)0.0;
+        real Ts = sampledTime;
+
+        // FIXED-CONSTANTS - USED FOR TESTING PID
+        m_measuredValue = (real)330.9624876;
+        m_setPoint = (real)20.7835093;
+        // Switch data points
+        // m_setPoint = (real)330.9624876;
+        // m_measuredValue = (real)20.7835093;
+
+        // Instantiate Object
+        m_controller = pid::Controller<real>(Kp, Ki, Kd, Ts);
+        m_controller.SetPoint(m_setPoint);
+    }
 
     template <typename real>
     ControlManager<real>::ControlManager(real min, real max, real sampledTime)
@@ -86,16 +120,13 @@ namespace pid
         m_max = max;
         // Controller Gains Kp, Ki and Kd should not be accessed from 
         // the main.cpp file..
-        real Kp = (float)0.50;
-        real Ki = (float)0.0;
-        real Kd = (float)0.0;
+        real Kp = (real)1;
+        real Ki = (real)0.0;
+        real Kd = (real)0.0;
         real Ts = sampledTime;
-        m_controller = pid::Controller<float>(Kp, Ki, Kd, Ts);
+        m_controller = pid::Controller<real>(Kp, Ki, Kd, Ts);
         // Random Number Generator
-        m_rNum = nmr::RandomNumber<float>(m_min, m_max);
-
-        // Liner Map - MAX ought to be exclusive so 360 degrees ought to be exclusive
-        m_linearMap = nmr::LinearMap<float>((float)min, (float)max, (float)0, (float)360);
+        m_rNum = nmr::RandomNumber<real>(m_min, m_max);
 
         // Control Manager Points
         m_SetRandomPoints();
@@ -130,13 +161,14 @@ namespace pid
     template <typename real>
     void ControlManager<real>::UpdateControlManager()
     {
-        // Controller
+        // Controller - Control_U can be either (+) or (-)
         m_control = m_controller.UpdatePID(m_measuredValue);
 
-        // Linear - Bounded
-        // Simulate Max Plant Output -------------------------- BUGFIX
-        if (m_control > (real)20) m_measuredValue += (real)20;
-        else m_measuredValue += m_linearMap.Reverse(m_control);
+        // WITH-OUT SIMULATION
+        m_measuredValue += m_control;
+
+        // SIMULATION 
+        // m_simulation();
 
         // Circular - Non-bounded
         // Polyninomial
@@ -148,23 +180,51 @@ namespace pid
     template <typename real>
     void ControlManager<real>::m_SetRandomMeasuredValue()
     {
-        real error = (real)0;
         do
         {
-            m_measuredValue = m_linearMap.Map(m_rNum.Random());
-            // m_setPoint 
-            error = m_setPoint - m_measuredValue;
-            // error squared
-            error *= error;
-            // error greater or equal to 10
-        } while (error < (real)100);
+            m_measuredValue = m_rNum.Random();
+        } while (abs(m_setPoint - m_measuredValue) < (real)45);
     }
 
     template <typename real>
     void ControlManager<real>::m_SetRandomPoints()
     {
-        m_setPoint = m_linearMap.Map(m_rNum.Random());
+        m_setPoint = m_rNum.Random();
         m_SetRandomMeasuredValue();
+    }
+
+    template <typename real>
+    void ControlManager<real>::m_simulation()
+    {
+        // Signed-Value for simulation...BUGFIX
+        real sign = (real)1;
+        if (m_control < (real)0) sign = (real)-1;
+
+        // Linear - Bounded
+        // Simulate Max Plant Output
+        // Interesting that it has to be additive...BUGFIX
+        // Use abs()...BUGFIX
+        if (abs(m_control) > (real)20)
+            m_measuredValue += (real)20 * sign + m_disturbance();
+        else
+            m_measuredValue += m_control * sign + m_disturbance();
+
+    }
+
+    template <typename real>
+    real ControlManager<real>::m_disturbance()
+    {
+        m_counter++;
+        // Constant Disturbances
+        if (m_counter < 2 || m_counter > 7)
+        {
+            if ((m_counter % 2) == 0)
+                return (real)-1.2;
+            else
+                return (real)1.2;
+        }
+        if (m_counter > 10) m_counter = 0;
+        return (real)0;
     }
 
     // Strings
@@ -204,7 +264,14 @@ namespace pid
     template <typename real>
     String ControlManager<real>::PrintControlPID()
     {
-        return m_control;
+        String str = String(m_control);
+        return str;
+    }
+
+    template <typename real>
+    String ControlManager<real>::PrintEID_PID()
+    {
+        return m_controller.PrintEID();
     }
 
     template <typename real>

@@ -5,8 +5,6 @@
 ## ***include folder***
 
 **Following classes are stand-alone**
-- **LinearMap.h**      
-    - (The LinearMap.h file is located in the Numerics Repository)
 - **Timer.h**          
     - (The Timer.h file is located in the Numerics Repository)
 - **RandomNumber.h**   
@@ -23,6 +21,8 @@
 - main.cpp  
     - (depended on *Timer.h*)
 
+- Note: 20230127 - Continuing testing Kp from zero to 1. Ki and Kd set to zero.
+
 ## ***root folder***
 
 - platformio.ini        
@@ -30,5 +30,5 @@
 
 ## ***Notes***
 
-- 20230125 Testing...
+- 20230127 Code changes... Removed LinearMap.h because there are too many variables for testing...
 
