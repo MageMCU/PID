@@ -173,7 +173,7 @@ namespace pid
         // m_simulation();
 
         // Circular - Non-bounded
-        // Polyninomial
+        // Polynomial
     }
     //////////////////////////////////////////////////////////////
 
