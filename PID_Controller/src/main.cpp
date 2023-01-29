@@ -13,11 +13,18 @@ void setup()
     Serial.begin(9600);
     while (!Serial) {}
 
+    float min = (float)0;
+    float max = (float)1000;
+    float  Kp = (float)0.95;
+    float  Ki = (float)0.0;
+    float  Kd = (float)0.0;
+    float  Ts = (float)0.050; // Sampled-Interval Ts
+
     // Sampled Time is 50 ms (or 0.05 s)
-    controlManager = pid::ControlManager<float>((float)0.05);
-    // controlManager = pid::ControlManager<float>((float)0, (float)1000, (float)0.05);
+    controlManager = pid::ControlManager<float>(Kp, Ki, Kd, Ts, min, max);
     controlTimer = nmr::Timer();
 
+    // Locate beinning csv-data
     Serial.println(".");
     Serial.println(".");
     Serial.println(".");

@@ -20,7 +20,7 @@ Studied several papers and textbooks on PID controllers. It seems each one is di
 
 ## In Development
 
-PID controller under development...
+PID controller under development... Will occasionally study Control Theory in my spare time...  
 
 ## Disclaimer and Terms
 

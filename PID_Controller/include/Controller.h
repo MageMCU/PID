@@ -7,7 +7,7 @@ namespace pid
 {
     // The Controller Class requires a timing interval at a constant rate...
     // Use the Timer.h object in the loop() function...
-    // Note: Not yet tested - ControlManager under development...
+    // Note: ControlManager under development...under development
     template <typename real>
     class Controller
     {
@@ -41,6 +41,7 @@ namespace pid
         real m_setPoint;
         // Errors
         real m_last_ef;
+        real m_last2_ef;
         // Control
         real m_uf;
         real m_last_uf;
@@ -122,7 +123,11 @@ namespace pid
     template<typename real>
     real Controller<real>::UpdatePID(real measuredValue)
     {
-        // Finite PID Approximations (Van de Vegte, FCS, 1986, p232) 
+        // Finite PID Approximations - sampled-Interval Ts
+        // (1) (Van de Vegte, FCS, 1986, p232) 
+        // (2) (Digital Control 978-1-349-21550-8)
+        // (3) Added PID considerations not used here...
+        // Basic Elements (Keep it simple for testing)
 
         // Error Function
         real ef = m_setPoint - measuredValue;
@@ -131,12 +136,23 @@ namespace pid
         // Integral (backward rectangular rule)
         real integral = m_integral + ef * m_Ts;
 
-        // Clamp integrator windup output (Hi & Lo)
+        // Alternate Integral Approximation:
+        // real eI = ef + (2 * m_last_ef) + m_last2_ef;
+        // real integral = m_integral + (0.5 * eI * m_Ts);
+        // Source: 
+        // 7. Discrete PID Control
+        // Dr James E. Pickering
+        // https://www.youtube.com/watch?v=LcsaEF-i1j
+        // NOT USED
+
+        // Clamp integrator anti-windup output (Hi & Lo)
         // NOT USED
 
         // Derivative Finite-Difference Approximation
         // Derivative (backward difference)
         real derivative = (ef - m_last_ef) / m_Ts;
+
+        // Derivative Filter: NOT USED
 
         // Besides the backward, there are forward
         // and central approximations...
@@ -149,13 +165,15 @@ namespace pid
         // Control  Function
         real uf = (m_Kp * ef) + (m_Ki * integral) + (m_Kd * derivative);
 
-        // U-Velocity Algorithm: uV = uf - m_last_uf; NOT USED
+        // U-Velocity Algorithm: uV = uf - m_last_uf;
         // m_last_uf = m_uf;
         m_uf = uf;
-        // return uf - m_last_uf;
+        // return uf - m_last_uf; // ------------------------- uV
 
         // U-Positional Algorithm: uP = uf
-        return uf;
+        return uf; // ---------------------------------------- uP
+
+        // Zero Order Hold (ZOH) subroutine u*f: NOT USED
     }
 
     // Strings

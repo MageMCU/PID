@@ -31,8 +31,7 @@ namespace pid
 
         // Constructor
         ControlManager() = default;
-        ControlManager(real sampledTime);
-        ControlManager(real min, real max, real sampledTime);
+        ControlManager(real Kp, real Ki, real Kd, real Ts, real min, real max);
         ~ControlManager() = default;
 
         // Getters
@@ -82,56 +81,34 @@ namespace pid
     // Constructor
 
     template <typename real>
-    ControlManager<real>::ControlManager(real sampledTime)
+    ControlManager<real>::ControlManager(real Kp, real Ki, real Kd, real Ts, real min, real max)
     {
         m_counter = 0;
-        // THIS IS NECESSARY TO UNDERSTAND THE MATH
-        // Consistent data for
-        // repeatable experiments...
-        m_min = (real)0;
-        m_max = (real)1000;
-        // K-values domain: 0-1.0
-        real Kp = (real)0.40;
-        real Ki = (real)0.0;
-        real Kd = (real)0.0;
-        real Ts = sampledTime;
+        m_setPoint = (real)0;
+        m_min = min;
+        m_max = max;
+        m_controller = pid::Controller<real>(Kp, Ki, Kd, Ts);
 
+#define DEBUG_WITH_CONSTANTS
+#ifndef DEBUG_WITH_CONSTANTS
+        // Random Number Generator - changes not tested here
+        m_rNum = nmr::RandomNumber<real>(m_min, m_max);
+        // Control Manager Points ---------------------- RANDOMIZE
+        m_SetRandomPoints();
+        // Controller SetPoint
+        m_controller.SetPoint(m_setPoint);
+#else
         // FIXED-CONSTANTS - USED FOR TESTING PID
-        m_measuredValue = (real)330.9624876;
-        m_setPoint = (real)20.7835093;
+        // m_measuredValue = (real)330.9624876;
+        // m_setPoint = (real)20.7835093;
         // Switch data points
-        // m_setPoint = (real)330.9624876;
-        // m_measuredValue = (real)20.7835093;
+        m_setPoint = (real)330.9624876;
+        m_measuredValue = (real)20.7835093;
 
         // Instantiate Object
         m_controller = pid::Controller<real>(Kp, Ki, Kd, Ts);
         m_controller.SetPoint(m_setPoint);
-    }
-
-    template <typename real>
-    ControlManager<real>::ControlManager(real min, real max, real sampledTime)
-    {
-        m_setPoint = (real)0;
-
-        // The min & max values are the end-points 
-        // of the number-line.
-        // Class properties
-        m_min = min;
-        m_max = max;
-        // Controller Gains Kp, Ki and Kd should not be accessed from 
-        // the main.cpp file..
-        real Kp = (real)1;
-        real Ki = (real)0.0;
-        real Kd = (real)0.0;
-        real Ts = sampledTime;
-        m_controller = pid::Controller<real>(Kp, Ki, Kd, Ts);
-        // Random Number Generator
-        m_rNum = nmr::RandomNumber<real>(m_min, m_max);
-
-        // Control Manager Points
-        m_SetRandomPoints();
-        // Controller SetPoint
-        m_controller.SetPoint(m_setPoint);
+#endif
     }
 
     // Getters
@@ -164,12 +141,12 @@ namespace pid
         // Controller - Control_U can be either (+) or (-)
         m_control = m_controller.UpdatePID(m_measuredValue);
 
-        // WITH-OUT SIMULATION
-        // Linear - Bounded
-        m_measuredValue += m_control;
+        // NO-SIMULATION
+        // To SUM (+=) or Not To SUM (=) ???
+        m_measuredValue += m_control; // using: uP[y] or uV[n]
+
 
         // SIMULATION 
-        // Linear - Bounded
         // m_simulation();
 
         // Circular - Non-bounded

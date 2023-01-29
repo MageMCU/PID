@@ -11,7 +11,8 @@
     - (The RandomNumber.h file is located in the Numerics Repository)
 - **Controller.h**         
     - (PID Controller)
-
+        - Finished research...
+        
 ***Control Manager class require the following dependencies***
 + ***ControlManager.h***     
     - (depended on *Controller.h*, *LinearMap.h* and *RandomNumber.h*)
@@ -21,7 +22,7 @@
 - main.cpp  
     - (depended on *Timer.h*)
 
-- Note: 20230127 - Continuing testing Kp from zero to 1. Ki and Kd set to zero.
+- Note: 20230128 - Will continue as time permits... Finished the research on Digital Control Systems with enough material to study the subject.
 
 ## ***root folder***
 
@@ -30,5 +31,5 @@
 
 ## ***Notes***
 
-- 20230127 Code changes... Removed LinearMap.h because there are too many variables for testing...
+- 20230128 Code changes... Reorganized Constructor for ControlManager.h...
 
