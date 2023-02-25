@@ -21,7 +21,6 @@
 
 - main.cpp  
     - (depended on *Timer.h*)
-
 - Note: 20230128 - Will continue as time permits... Finished the research on Digital Control Systems with enough material to study the subject.
 
 ## ***root folder***

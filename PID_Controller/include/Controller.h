@@ -1,3 +1,26 @@
+//
+// Carpenter Software
+// File: Controller.h
+//
+// Purpose: Public Github Account - MageMCU
+// Repository: PID-Controller 
+// Date Created: 20230215
+// Folder: PID_Controller/include
+//
+// Author: Jesse Carpenter (carpentersoftware.com)
+// Email:carpenterhesse@gmail.com
+//
+// Testing Platform:
+//  * MCU:Atmega328P
+//  * Editor: VSCode
+//  * VSCode Extension: Microsoft C/C++ IntelliSense, debugging, and code browsing.
+//  * VSCode Extension:PlatformIO
+// 
+// Revised Header-Comment 20230219
+//
+// MIT LICENSE
+//
+
 #ifndef PID_Controller_h
 #define PID_Controller_h
 
