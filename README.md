@@ -24,4 +24,4 @@ PID controller under development... Will occasionally study Control Theory in my
 
 ## Disclaimer and Terms
 
-Please follow the ***Disclaimer*** and ***Terms*** in the ***Numerics*** Repository.
+Please follow the ***Disclaimer*** and ***Terms*** in the ***PID-Controller*** Repository.
